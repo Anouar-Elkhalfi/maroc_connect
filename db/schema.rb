@@ -10,9 +10,69 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_01_125401) do
+ActiveRecord::Schema[7.1].define(version: 2025_08_15_163340) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "applications", force: :cascade do |t|
+    t.bigint "talent_id", null: false
+    t.bigint "job_id", null: false
+    t.string "status"
+    t.text "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["job_id"], name: "index_applications_on_job_id"
+    t.index ["talent_id"], name: "index_applications_on_talent_id"
+  end
+
+  create_table "companies", force: :cascade do |t|
+    t.string "name"
+    t.string "industry"
+    t.string "location"
+    t.string "logo_url"
+    t.string "website_url"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "company_users", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "company_id", null: false
+    t.string "role"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_company_users_on_company_id"
+    t.index ["user_id"], name: "index_company_users_on_user_id"
+  end
+
+  create_table "jobs", force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.text "requirements"
+    t.string "location"
+    t.string "employment_type"
+    t.string "salary_range"
+    t.bigint "company_id", null: false
+    t.integer "created_by"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_jobs_on_company_id"
+  end
+
+  create_table "talents", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.text "skills"
+    t.text "experience"
+    t.string "linkedin_url"
+    t.string "portfolio_url"
+    t.string "cv_url"
+    t.boolean "available"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_talents_on_user_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -22,8 +82,15 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_01_125401) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "role"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "applications", "jobs"
+  add_foreign_key "applications", "talents"
+  add_foreign_key "company_users", "companies"
+  add_foreign_key "company_users", "users"
+  add_foreign_key "jobs", "companies"
+  add_foreign_key "talents", "users"
 end
